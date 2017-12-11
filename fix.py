@@ -27,27 +27,20 @@ def downloadRecentFixFile():
     
     paramiko.util.log_to_file("paramiko.log")
     try:
-        print password
-        print username
 
         transport = paramiko.Transport((host, port))
         transport.connect(username = username, password = password)
-        #sftp = paramiko.SFTPClient.from_transport(transport)
-        #sftp.chdir('artefacts/')
     except:
         print "Unexpected error:", sys.exc_info()[0]
         raise
     else:
         sftp = paramiko.SFTPClient.from_transport(transport)
-        #sftp.chdir('artefacts/')
         sftp.chdir('/data/sample')
     finally:
         print "Cleaning up the stuff before leaving try"
     
-    #sftp.chdir('artefacts/')
-
     '''
-         Contents of artefacts directory on ftp server
+         Sample FTP server list: Contents of artefacts directory on ftp server
          -rwxr-xr-x  1 mnagekar  admins  2397869 Dec  2 17:42 cme-msg-trace-cl-CME-2016-04-14T21_24_48.086Z.db
          -rwxr-xr-x  1 mnagekar  admins  2397869 Dec  2 16:12 cme-msg-trace-cl-CME-2016-04-14T21_24_48.087Z.db
          -rwxr-xr-x  1 mnagekar  admins  2397869 Dec  2 16:15 cme-msg-trace-cl-CME-2016-04-14T21_24_48.088Z.db
@@ -64,21 +57,22 @@ def downloadRecentFixFile():
             if fileattr.filename.startswith('cme-msg') and fileattr.st_mtime > latest:
                 latest = fileattr.st_mtime
                 latestfile = fileattr.filename
-                if latestfile is not None:
-                    fileName = './' + latestfile
-                    print "Downloading file ==> " + fileName
-                    sftp.get(fileName, fileName)
-                else:
-                    print "ERROR: Didn't find the file to download"
-                    sys.exit(1)
-
+                print latestfile
         except IOError as e:
             print e
+    
+    if latestfile is not None:
+        fileName = latestfile
+        print "Downloading file ==> " + fileName
+        sftp.get(fileName, fileName)
+    else:
+        print "ERROR: Didn't find the file to download"
+        sys.exit(1)
+    
     sftp.close()
     transport.close()
 
 def calculateOrderSingle():
-    print fileName
     
     SOH='\x01'
     NEWLINE="\n"
